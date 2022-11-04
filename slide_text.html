@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="UTF-8">
+	<title>이벤트</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/reset.css">
+    <script src="https://kit.fontawesome.com/85b4ce6da2.js" crossorigin="anonymous"></script>
+    <script src="js/jquery-3.5.1.min.js"></script>
+</head>
+<style>
+    section.room {width:100%;}
+    h2.jost {text-align: center; font-size: 60px; font-weight: normal; padding: 40px; letter-spacing: 4px;}
+    .slideArea:after {content:''; display: block; clear:both; position: relative;}
+    
+    .text {
+        width: 60%; height: 55vh;float:left; background: #2e3d57; position: relative;
+    }
+    .text>ul {width: 100%; height: 33vh;  position:relative;}
+    .text>ul>li { width: 75%; height: 33vh;  position:absolute; left:15%; text-align: left;}
+    .text>ul>li:nth-child(1) {top:30%;}
+    .text>ul>li:nth-child(2), .text>ul>li:nth-child(3),.text>ul>li:nth-child(4) {opacity: 0; top: 50%;}
+    .text>ul>li>h2>span {color: #b18759; font-weight: normal; font-size: 16px;}
+    .text>ul>li>h3.jost {font-size: 40px; font-weight: normal; color: #fff; padding-bottom: 20px;}
+    .text>ul>li>p>span {display:block; color:beige; font-size: 18px; line-height: 30px; opacity: 0.7;}
+    .btnL { width: 200px; height: 60px; border: 1px solid beige; opacity: 0.7; position: absolute;bottom:1%;}
+    .btnL>span {display: block; text-align: center; line-height: 60px; color: #fff;}
+    
+    .photo {
+        width:55%;
+        float: right;
+        position:absolute;
+        right:0;
+        top: 22%;
+        overflow: hidden;
+    }
+    .photo ul {width: 280%; position: relative;}
+    .photo ul:after {content:''; display: block; clear:both;}
+    .photo ul li {float:left; width:25%; padding: 1%;}
+    .photo ul li img {display: block; width:100%;}
+    
+    .room-prev {position: absolute; width: 50px; height: 50px; border-radius: 100px; background:#242424; opacity: 0.5; top: 45%; transform: translateY(-45%); left: 20px;
+        background-image:url("img/btn_prev01.png"); background-repeat: no-repeat; background-position: center center;
+    }
+    .room-next {position: absolute; width: 50px; height: 50px; border-radius: 100px; background:#242424; opacity: 0.5; top: 45%; transform: translateY(-45%); right: 20px; 
+        background-image:url("img/btn_next01.png"); background-repeat: no-repeat; background-position: center center;
+    }
+</style>
+<script>
+   $(function(){
+        var banner = $(".photo").find("ul");
+        var text = $(".text").find("ul");
+        var bannerWidth = banner.children().outerWidth();//border를 포함한 li넓이
+        var bannerHeight = banner.children().outerHeight();
+        var length = banner.children().length; //li의 갯수
+        var setIntervalId =0;
+
+        rollingBanner();
+        function rollingBanner(){
+            setIntervalId = setInterval(function(){
+               $(".room-next").trigger("click");
+            }, 3500); 
+        }
+        banner.css("width", bannerWidth*length+"px");//ul의 넓이값 : 340*6
+        banner.css("height", bannerHeight+"px");
+
+        $(".room-next").click(function(){
+            text.eq(0).stop().animate({top:100, opacity: 0}, 500).queue(function(){
+                //텍스트 복사
+                text.append("<li>"+text.find("li:first").html()+"</li>");
+                text.find("li:first").remove(); //삭제 
+                text.eq(0).stop().css({top:100, opacity:0},2500);
+                text.eq(0).stop().animate({top:30, opacity: 1}, 500);
+            });
+           
+            banner.animate({left:-bannerWidth+"px"}, 2500, function(){
+                // 첫번째 이미지를 마지막 끝에 복사(이동이 아니라 복사)
+                $(this).append("<li>"+$(this).find("li:first").html()+"</li>");
+                $(this).css("left", 0);
+                $(this).find("li:first").remove(); //삭제
+                
+            });
+            
+        });
+       
+        $(".room-prev").click(function(){
+            text.eq(0).stop().animate({top:100, opacity: 0}, 500).queue(function(){
+                //텍스트 복사
+                text.prepend("<li>"+text.find("li:last").html()+"</li>");
+                text.find("li:last").remove(); //삭제 
+                text.eq(0).stop().css({top:100, opacity:0},2500);
+                text.eq(0).stop().animate({top:30, opacity: 1}, 500);
+            });
+            
+            banner.prepend("<li>"+banner.find("li:last").html()+"</li>");
+            banner.find("li:last").remove();
+            banner.css("left", -bannerWidth);
+            banner.stop().animate({left:0}, 2500);
+        });
+       
+        //text영역에 마우스를 가져가면 슬라이드 멈춘다.
+        $(".text").on({
+            mouseenter:function(){
+                clearInterval(setIntervalId);
+            },
+            mouseleave:function(){
+                rollingBanner();
+            }
+        });
+   });
+</script>
+
+<body>
+<section class="rooms">
+    <h2 class="jost"><span>LUXE ACCOMMODATIONS</span></h2>
+    <div class="slideArea">
+        <div class="text">
+           <ul>
+               <li class="1">
+                    <h2><span>STAY</span></h2>
+                    <h3 class="jost"><span>객실</span></h3>
+                    <p><span>오픈 컨셉 65m²의 드넓은 공간에서 누리는 시원한 개방감,<br>바닥부터 천정까지 이어지는 전면 유리 속 투명한 제주 바다와<br>한라산 풍경이 오래도록 기억될 소중한 추억을 만들어드릴 것입니다.</span></p>
+                    <div class="btnL">
+                        <span>전체 보기</span>
+                    </div>       
+               </li>
+               <li class="2">
+                   <h2><span>STAY</span></h2>
+                    <h3 class="jost"><span>스위트룸</span></h3>
+                    <p><span>스위트룸 그 이상의 가치를 전해드리고픈 하얏트의 마음을 담았습니다.<br>제주가 한눈에 펼쳐지는 파노라믹한 전망과 귀한 분들을 위해 준비한<br>프리미엄 혜택을 마음껏 누리십시오.</span></p>
+                    <div class="btnL">
+                        <span>전체 보기</span>
+                    </div>
+               </li>
+               <li class="3">
+                    <h2><span>STAY</span></h2>
+                    <h3 class="jost"><span>객실</span></h3>
+                    <p><span>오픈 컨셉 65m²의 드넓은 공간에서 누리는 시원한 개방감,<br>바닥부터 천정까지 이어지는 전면 유리 속 투명한 제주 바다와<br>한라산 풍경이 오래도록 기억될 소중한 추억을 만들어드릴 것입니다.</span></p>
+                    <div class="btnL">
+                        <span>전체 보기</span>
+                    </div>       
+               </li>
+               <li class="4">
+                   <h2><span>STAY</span></h2>
+                    <h3 class="jost"><span>스위트룸</span></h3>
+                    <p><span>스위트룸 그 이상의 가치를 전해드리고픈 하얏트의 마음을 담았습니다.<br>제주가 한눈에 펼쳐지는 파노라믹한 전망과 귀한 분들을 위해 준비한<br>프리미엄 혜택을 마음껏 누리십시오.</span></p>
+                    <div class="btnL">
+                        <span>전체 보기</span>
+                    </div>
+               </li class="1">
+           </ul>
+        </div>    
+        <div class="photo">
+            <ul>
+                <li>
+                   <figure>
+                        <img src="img/room_standard01.jpg" alt="ROOM">
+                    </figure> 
+                </li>
+                <li>
+                    <figure>
+                        <img src="img/room_suite01.jpg" alt="SUITE">
+                    </figure>
+                </li>
+                <li>
+                   <figure>
+                        <img src="img/room_standard01.jpg" alt="ROOM">
+                    </figure> 
+                </li>
+                <li>
+                    <figure>
+                        <img src="img/room_suite01.jpg" alt="SUITE">
+                    </figure>
+                </li>
+            </ul>
+        </div>
+        <div class="room-paging">
+            <span></span>
+            <span></span>
+        </div>
+        <div class="room-prev"></div>
+        <div class="room-next"></div>
+    </div>
+</section>
+</body>
+</html>
